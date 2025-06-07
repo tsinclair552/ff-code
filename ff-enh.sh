@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# This script does face-enhance only. 
+# NOTE: This can take some time, especially for video!
+
 #USAGE <CMD> <OUTPUT_PREFIX> <SRC_IMG> <TGT_DIR> <FILE_TYPE>
 
 # Set variables
