@@ -1,3 +1,31 @@
 Just a scratchpad for ideas, current project developments and so forth.
 
 
+AI Tools as of 08/06/2025:
+
+Standalone AI Tools:
+DrawThings - image generator
+AnythingLLM - Document interaction, chat, AI agents
+Diffusers - image generator
+DiffusionBee - image generation, inpainting, outpainting
+LM Studio - experiment with LLMs, manage documents, chat
+UpScayl - image upscaler
+
+Tools installed on Pinokio:
+
+MagicQuill - image editor
+RMBG-2 Studio - Remove and replace image background
+StyleTTS2 Studio - Build a voice and TTS
+FaceFusion - face swap, lip sync, face enhance, frame enhance
+Fooocus - lightweight image generator using Stable Diffusion
+InstantIR - restore low-res or broken images, recreate new version of the image
+LivePortrait - character animation
+MAGNet - text-to-music and text-to-sound generator
+omnigen - image generator
+OpenAudio - text-to-speech with voice cloning
+parler-tts - lightweight text-to-speech with text prompt control
+PhotoMaker2 - human photo generator
+pyramidflow - text-to-image and image-to-image video generator
+
+CapCut can also generate images, video and dialogue scenes with AI
+
