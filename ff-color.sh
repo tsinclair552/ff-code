@@ -5,10 +5,9 @@
 # To use, run command with an output file prefix, a directory of files to process
 # and the file extension (ex. jpg, mp4) of the files in the target folder.
 
-#USAGE <CMD> <OUTPUT_PREFIX> <SRC_IMG> <TGT_DIR> <FILE_TYPE>
+#USAGE <CMD> <OUTPUT_PREFIX> <TGT_DIR> <FILE_TYPE>
 
 # Set variables
-
 
 MEDIA_DIR=/Volumes/SkyNet/Multimedia
 FACE_DIR=$MEDIA_DIR/Pix2/__InBox/_AI_Faces
