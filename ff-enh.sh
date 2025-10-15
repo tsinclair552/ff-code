@@ -3,7 +3,7 @@
 # This script does face-enhance only. 
 # NOTE: This can take some time, especially for video!
 
-#USAGE <CMD> <OUTPUT_PREFIX> <SRC_IMG> <TGT_DIR> <FILE_TYPE>
+#USAGE <CMD> <OUTPUT_PREFIX> <TGT_DIR> <FILE_TYPE>
 
 # Set variables
 
@@ -25,7 +25,7 @@ cd $FF_DIR
 
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; \
-python facefusion.py batch-run -s $FACE_DIR/$2 -t $3/"*.$4" -o $OUTPUT_DIR/"$OUT_PREFIX{index}".$4 \
+python facefusion.py batch-run -t $2/"*.$3" -o $OUTPUT_DIR/"$OUT_PREFIX{index}".$3 \
  --processors face_enhancer \
  --execution-providers coreml cpu --face-selector-gender female \
  --face-detector-angles 0 90 180 270
