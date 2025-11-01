@@ -30,7 +30,7 @@ eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; \
 python facefusion.py batch-run -s $FACE_DIR/$2 -t $3/"*.$4" -o $OUTPUT_DIR/"$OUT_PREFIX{index}".$4 \
  --processors face_swapper face_enhancer \
- --execution-providers coreml cpu  \
+ --execution-providers coreml cpu  --face-selector-gender female \
  --face-detector-angles 0 90 180 270
 
 
