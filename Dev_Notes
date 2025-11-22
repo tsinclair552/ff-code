@@ -29,3 +29,12 @@ pyramidflow - text-to-image and image-to-image video generator
 
 CapCut can also generate images, video and dialogue scenes with AI
 
+Projects:
+
+Update app defaults for FaceFusion to match the scripts
+- --face-detector-angles 0 90 180 270
+- --execution-providers coreml cpu
+- --face-selector-gender female
+
+Adjust face detector sensitive for AI video face inconsistencies
+
