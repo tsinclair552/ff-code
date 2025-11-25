@@ -135,3 +135,7 @@ Next create a shell script that cd's to the directory and runs the command.
 
 Need to set output folder
 
+FaceFusion 3.4.1 Content Filter
+
+https://www.reddit.com/r/StableDiffusion/comments/1o5f4pj/facefusion_341_content_filter/
+
