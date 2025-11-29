@@ -18,7 +18,7 @@ MEDIA_DIR=/Volumes/SkyNet/Multimedia
 FACE_DIR=$MEDIA_DIR/Pix2/__InBox/_AI_Faces
 TARGET_DIR=~/Downloads/Test_Bed
 OUTPUT_DIR=~/pinokio/cache/TMPDIR
-FF_DIR=~/pinokio/api/facefusion32-pinokio.git/facefusion
+FF_DIR=~/pinokio/api/facefusion-pinokio.git/facefusion
 #OUT_PREFIX=outfile
 OUT_PREFIX=$1
 
@@ -32,8 +32,8 @@ eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate ~/pinokio/api/facefusion32-pinokio.git/.env ; \
 python facefusion.py batch-run -s $FACE_DIR/$2 -t $3/"*.$4" -o $OUTPUT_DIR/"$OUT_PREFIX{index}".$4 \
  --processors face_swapper \
- --execution-providers coreml cpu --face-selector-gender female --reference-face-distance 0.75 \
- --face-detector-angles 0 90 180 270
+ --execution-providers coreml cpu  --face-selector-gender female --reference-face-distance 0.75 \
+ --face-detector-angles 0 90 180 
 
 
 
