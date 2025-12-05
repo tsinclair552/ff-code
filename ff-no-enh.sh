@@ -2,6 +2,10 @@
 
 # This script does face-enhance ONLY. Suitable for both images and videos
 
+# Modified 11/29/2025 to set face selector mode to one (default is reference
+# As of 3.4.1, FF seems to need the reference face to show up in the first frame
+# of a video
+
 #USAGE <CMD> <OUTPUT_PREFIX> <SRC_IMG> <TGT_DIR> <FILE_TYPE>
 
 # Set variables
@@ -25,7 +29,7 @@ eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; \
 python facefusion.py batch-run -s $FACE_DIR/$2 -t $3/"*.$4" -o $OUTPUT_DIR/"$OUT_PREFIX{index}".$4 \
  --processors face_swapper \
- --execution-providers coreml cpu --face-selector-gender female --reference-face-distance 0.5 \
+ --execution-providers coreml cpu --face-selector-gender female --face-selector-mode one \
  --face-detector-angles 0 90 180 270
 
 
