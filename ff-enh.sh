@@ -28,7 +28,7 @@ deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; \
 python facefusion.py batch-run -t $2/"*.$3" -o $OUTPUT_DIR/"$OUT_PREFIX{index}".$3 \
  --processors face_enhancer \
  --execution-providers cpu --face-selector-gender female \
- --face-detector-angles 0 90 180 270
+ --face-detector-angles 0 90 270
 
 
 
