@@ -2,9 +2,6 @@
 
 # A script to scan files to check for NSFW content
 
-# I take the guts of the ff-no-enh.sh script 
-# modify them to use run instead of batch-run so I can 
-# feed in a file at a time, noting the currently processing file name.
 
 #USAGE <CMD> <TGT_DIR> <FILE_TYPE>
 
@@ -14,11 +11,9 @@
 
 MEDIA_DIR=/Volumes/SkyNet/Multimedia
 FACE_DIR=$MEDIA_DIR/Pix2/__InBox/_AI_Faces
-TARGET_DIR=~/Downloads/Test_Bed
 OUTPUT_DIR=~/pinokio/cache/TMPDIR
 FF_DIR=~/pinokio/api/facefusion-pinokio.git/facefusion
-TMP_FILE=/Users/tsinclair/Downloads/errors.txt
-#OUT_PREFIX=outfile
+TMP_FILE=$OUTPUT_DIR/errors.txt
 OUT_PREFIX=$1
 
 # CD to the FaceFusion directory
@@ -28,17 +23,21 @@ cd $FF_DIR
 # Run FaceFusion 
 
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
-deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; \
+deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; 
 
 echo > "$TMP_FILE"  #clear error file
-for i in $1/*.*;
+
+# Loop through the target directory and scan files of the given type
+# Check the FF error code for each scan and log filenames that don't pass the filter
+
+for i in $1/*.$2;
 do
-echo scanning $i:t
+# echo scanning $i:t
 python facefusion.py headless-run -s $FACE_DIR/Default01.jpg -t $i -o $OUTPUT_DIR/test.$2 \
  --processors face_swapper \
  --execution-providers cpu coreml --face-selector-gender female --face-selector-mode one \
  --face-detector-angles 0 90 270
- #echo error code is $?
+
 if [[ $? -eq 1 ]]; then
         echo "$i:t" >> "$TMP_FILE"
     fi
