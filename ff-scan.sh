@@ -17,6 +17,7 @@ FF_DIR=~/pinokio/api/facefusion-pinokio.git/facefusion
 TMP_FILE=$OUTPUT_DIR/errors.txt
 OUT_PREFIX=$1
 TEST_DIR=~/Downloads/Test_Bed
+BIN_DIR=/Volumes/SkyNet/Reference/bin
 
 # CD to the FaceFusion directory
 
@@ -27,7 +28,7 @@ cd $FF_DIR
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; 
 
-echo > "$TMP_FILE"  #clear error file
+cp /dev/null "$TMP_FILE"  #clear error file
 
 # Loop through the target directory and scan files of the given type
 # Check the FF error code for each scan and log filenames that don't pass the filter
@@ -45,3 +46,5 @@ if [[ $? -eq 1 ]]; then
     fi
 
 done
+
+$BIN_DIR/organize.sh -s $1 -d _NSFW -f $TMP_FILE -r
