@@ -1,0 +1,8 @@
+{
+  "tools": {
+    "allow": ["Bash", "Read", "Glob", "Grep"],
+    "deny": ["Write", "Edit"]
+  },
+  "maxTokens": 8000,
+  "temperature": 0.3
+}
