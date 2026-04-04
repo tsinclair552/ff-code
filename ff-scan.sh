@@ -38,7 +38,7 @@ do
 # echo scanning $i:t
 python facefusion.py headless-run -s $TEST_DIR/test.mp3 -t $i -o $OUTPUT_DIR/test.$2 \
  --processors lip_syncer \
- --execution-providers cpu coreml  \
+ --execution-providers coreml  \
  --face-detector-angles 0 90 270
 
 if [[ $? -eq 1 ]]; then
