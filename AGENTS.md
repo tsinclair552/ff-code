@@ -7,8 +7,8 @@ Shell scripts (zsh) for FaceFusion face swapping, enhancement, lip syncing, and 
 ```zsh
 shellcheck ff-test.sh        # Lint single script
 shellcheck *.sh               # Lint all scripts
-./ff-test.sh ~/Downloads/Test_Bed mp4    # Run test
-./ff-batch.sh out source.jpg ~/Test mp4  # Batch: <PREFIX> <SRC> <DIR> <EXT>
+./ff-test.sh ~/Test mp4      # Run test
+./ff-batch.sh out src.jpg ~/Videos mp4  # Batch: <PREFIX> <SRC> <DIR> <EXT>
 ```
 
 ## Shell Configuration
@@ -21,33 +21,42 @@ shellcheck *.sh               # Lint all scripts
 #!/bin/zsh
 
 # Brief description
-# Additional context if needed
 
 #USAGE <CMD> <ARG1> <ARG2> <ARG3>
 
-# Set variables
+SCRIPT_DIR=${0:a:h}
+if [[ -f "$SCRIPT_DIR/.env" ]]; then
+    source "$SCRIPT_DIR/.env"
+fi
 
-# Main logic
+# Default values (override from .env)
+FACE_DIR="${FACE_DIR:-$HOME/Faces}"
+OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
+FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
+CONDA_ENV_PATH="$HOME/pinokio/api/facefusion-pinokio.git/.env"
 
-# EOF
+mkdir -p "$OUTPUT_DIR"
+cd "$FF_DIR"
+
+# Conda activation and FaceFusion command
+eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
+deactivate ; conda activate "$CONDA_ENV_PATH" ; \
+python facefusion.py ...
 ```
 
-## Variables Convention
+## Configuration (.env)
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Constants/Paths | UPPER_CASE | `MEDIA_DIR`, `FF_DIR` |
-| Local variables | lower_case | `tmp_file`, `out_prefix` |
-| Function arguments | $1, $2, etc. | positional parameters |
+All scripts load settings from `.env` in the script directory:
 
-Required variables:
-```zsh
-MEDIA_DIR=/Volumes/SkyNet/Multimedia
-FACE_DIR=$MEDIA_DIR/Pix2/__InBox/_AI_Faces
-TARGET_DIR=~/Downloads/Test_Bed
-OUTPUT_DIR=~/pinokio/cache/TMPDIR
-FF_DIR=~/pinokio/api/facefusion-pinokio.git/facefusion
-OUT_PREFIX=$1
+```bash
+# .env configuration
+FACE_DIR=~/Faces                    # Source face images
+TARGET_DIR=~/Videos                # Target videos/images
+OUTPUT_DIR=~/tmp/facefusion        # Output directory
+FF_DIR=~/.facefusion/facefusion    # FaceFusion installation
+CONDA_ENV_PATH=~/.conda/envs/facefusion  # Conda environment path
+TMP_FILE=~/tmp/facefusion/errors.txt
+SCAN_AUDIO=~/test.mp3              # Audio file for NSFW scanning (lip_syncer requires audio)
 ```
 
 ## Error Handling & Comments
@@ -70,29 +79,30 @@ fi
 | Type | Convention | Example |
 |------|------------|---------|
 | Scripts | `ff-{purpose}.sh` | `ff-batch.sh` |
-| Documentation | `ff-{topic}.md` | `ff-solution.md` |
+| Config | `.env` | User configuration |
+| Config template | `.env.example` | Default values |
 
 ## FaceFusion Command Patterns
 
 ### Conda Activation
 ```zsh
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
-deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; \
+deactivate ; conda activate "$CONDA_ENV_PATH" ; \
 ```
 
 ### Batch Run
 ```zsh
-python facefusion.py batch-run -s $FACE_DIR/$2 -t $3/"*.$4" -o $OUTPUT_DIR/"$OUT_PREFIX{index}".$4 \
+python facefusion.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/$1{index}.$4" \
  --processors face_swapper face_enhancer \
- --execution-providers cpu coreml --face-selector-gender female \
+ --execution-providers coreml --face-selector-gender female \
  --face-detector-angles 0 90 180 270
 ```
 
 ### Headless Run
 ```zsh
-python facefusion.py headless-run -s $FACE_DIR/$2 -t $i -o $OUTPUT_DIR/test.$2 \
+python facefusion.py headless-run -s "$FACE_DIR/$2" -t "$i" -o "$OUTPUT_DIR/test.$2" \
  --processors face_swapper \
- --execution-providers cpu coreml --face-selector-gender female \
+ --execution-providers coreml --face-selector-gender female \
  --face-detector-angles 0 90 270
 ```
 
@@ -100,22 +110,23 @@ python facefusion.py headless-run -s $FACE_DIR/$2 -t $i -o $OUTPUT_DIR/test.$2 \
 
 ```
 ff-code/
-├── ff-ai.sh      # AI video face swap (higher reference distance)
-├── ff-batch.sh    # Face swap + enhance (batch)
-├── ff-enh.sh      # Face enhancement only
-├── ff-no-enh.sh   # Face swap only
-├── ff-ref.sh      # Reference mode selector
-├── ff-scan.sh     # NSFW content scanning
-├── ff-test.sh     # Feature testing
-├── ff-cartoon.sh  # Cartoon-style face swap
-├── ff-color.sh    # Color-adjusted face swap
-├── ff-exp.sh      # Experimental features
-├── ff-photo.sh    # Photo-specific processing
-├── ff-rename.sh   # Batch rename output files
-├── ff-size.sh     # Size-based processing
-├── ff-debug.sh    # Debug mode
-├── docs/          # Documentation and test results
-└── Dev_Notes      # Development scratchpad
+├── .env.example       # Config template (copy to .env)
+├── ff-ai.sh          # AI video face swap
+├── ff-batch.sh       # Face swap + enhance (batch)
+├── ff-enh.sh         # Face enhancement only
+├── ff-no-enh.sh      # Face swap only
+├── ff-ref.sh         # Reference mode selector
+├── ff-scan.sh        # NSFW content scanning
+├── ff-test.sh        # Feature testing
+├── ff-cartoon.sh     # Cartoon-style face swap
+├── ff-color.sh       # Color-adjusted face swap
+├── ff-exp.sh         # Face swap + expression restore
+├── ff-photo.sh       # Full processing
+├── ff-rename.sh      # Batch rename output files
+├── ff-size.sh        # Check aspect ratios
+├── ff-debug.sh       # Debug mode
+├── docs/             # Documentation and test results
+└── Dev_Notes         # Development scratchpad
 ```
 
 ## Common FaceFusion Options
@@ -142,4 +153,4 @@ FaceFusion via Pinokio, Conda, FFmpeg, Python 3.10+
 1. **FFmpeg not installed**: `brew install ffmpeg`
 2. **NSFW blocked**: Modify `content_analyzer.py` (see `docs/ff-test-mod.md`)
 3. **Face not detected**: Use `face-selector-mode one`
-4. **conda fails**: Chain multiple `conda deactivate` calls
+4. **conda fails**: Check CONDA_ENV_PATH in `.env`

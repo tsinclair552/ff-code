@@ -1,41 +1,44 @@
 #!/bin/zsh
 
-# A script to test new features for the FF batch scripts
+# Test script for new FaceFusion features
 
 #USAGE <CMD> <TGT_DIR> <FILE_TYPE>
 
-# Set variables
+SCRIPT_DIR=${0:a:h}
+if [[ -f "$SCRIPT_DIR/.env" ]]; then
+    source "$SCRIPT_DIR/.env"
+fi
 
-MEDIA_DIR=/Volumes/SkyNet/Multimedia
-FACE_DIR=$MEDIA_DIR/Pix2/__InBox/_AI_Faces
-TARGET_DIR=~/Downloads/Test_Bed
-OUTPUT_DIR=~/pinokio/cache/TMPDIR
-FF_DIR=~/pinokio/api/facefusion-pinokio.git/facefusion
-TMP_FILE=/Users/tsinclair/Downloads/errors.txt
-#OUT_PREFIX=outfile
-OUT_PREFIX=$1
+FACE_DIR="${FACE_DIR:-$HOME/Faces}"
+OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
+FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
+CONDA_ENV="${CONDA_ENV:-facefusion}"
+CONDA_ENV_PATH="$HOME/pinokio/api/facefusion-pinokio.git/.env"
+TMP_FILE="${TMP_FILE:-$HOME/tmp/facefusion/errors.txt}"
 
-# CD to the FaceFusion directory
+mkdir -p "$OUTPUT_DIR"
 
-cd $FF_DIR
-
-# Run FaceFusion 
+cd "$FF_DIR"
 
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
-deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; \
+deactivate ; conda activate "$CONDA_ENV_PATH"
 
 echo > "$TMP_FILE"
-for i in $1/*.*;
-do
-echo scanning $i:t
-python facefusion.py headless-run -s $FACE_DIR/Default01.jpg -t $i -o $OUTPUT_DIR/test.$2 \
- --processors face_swapper \
- --execution-providers cpu coreml --face-selector-gender female --face-selector-mode one \
- --face-detector-angles 0 90 270
- #echo error code is $?
-if [[ $? -eq 1 ]]; then
+
+files=($1/*.$2)
+total=${#files[@]}
+counter=0
+
+for i in $1/*.$2; do
+    ((counter++))
+    echo "[$counter/$total] Testing $i:t..."
+    python facefusion.py headless-run -s "$FACE_DIR/default.jpg" -t "$i" -o "$OUTPUT_DIR/test.$2" \
+     --processors face_swapper \
+     --execution-providers cpu coreml --face-selector-gender female --face-selector-mode one \
+     --face-detector-angles 0 90 270
+    
+    if [[ $? -eq 1 ]]; then
         echo "$i:t" >> "$TMP_FILE"
     fi
 
 done
-

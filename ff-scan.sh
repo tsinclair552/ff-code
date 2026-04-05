@@ -1,50 +1,127 @@
 #!/bin/zsh
 
 # A script to scan files to check for NSFW content
-
 # Updated to use the lipsync processor to improve performance
 
 #USAGE <CMD> <TGT_DIR> <FILE_TYPE>
 
-# Just give the target directory and the file type
+SCRIPT_DIR=${0:a:h}
+if [[ -f "$SCRIPT_DIR/.env" ]]; then
+    source "$SCRIPT_DIR/.env"
+fi
 
-# Set variables
+FACE_DIR="${FACE_DIR:-$HOME/Faces}"
+OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
+FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
+CONDA_ENV="${CONDA_ENV:-facefusion}"
+TMP_FILE="${TMP_FILE:-$HOME/tmp/facefusion/errors.txt}"
+SCAN_AUDIO="${SCAN_AUDIO:-$HOME/test.mp3}"
+CONDA_ENV_PATH="$HOME/pinokio/api/facefusion-pinokio.git/.env"
 
-MEDIA_DIR=/Volumes/SkyNet/Multimedia
-FACE_DIR=$MEDIA_DIR/Pix2/__InBox/_AI_Faces
-OUTPUT_DIR=~/pinokio/cache/TMPDIR
-FF_DIR=~/pinokio/api/facefusion-pinokio.git/facefusion
-TMP_FILE=$OUTPUT_DIR/errors.txt
-OUT_PREFIX=$1
-TEST_DIR=~/Downloads/Test_Bed
-BIN_DIR=/Volumes/SkyNet/Reference/bin
+mkdir -p "$OUTPUT_DIR"
 
-# CD to the FaceFusion directory
+organize_files() {
+    local source_dir="$1"
+    local subdir="$2"
+    local filelist="$3"
+    local dry_run="${4:-true}"
 
-cd $FF_DIR
+    if [[ -z "$source_dir" ]] || [[ -z "$subdir" ]] || [[ -z "$filelist" ]]; then
+        echo "Usage: organize_files <source_dir> <subdir> <filelist> [dry_run]" >&2
+        return 1
+    fi
 
-# Run FaceFusion 
+    source_dir="${source_dir/#\~/$HOME}"
+    filelist="${filelist/#\~/$HOME}"
+
+    if [[ ! -d "$source_dir" ]]; then
+        echo "Error: Source directory does not exist: $source_dir" >&2
+        return 1
+    fi
+
+    if [[ ! -f "$filelist" ]]; then
+        echo "Error: Filelist does not exist: $filelist" >&2
+        return 1
+    fi
+
+    local dest_dir="$source_dir/$subdir"
+    mkdir -p "$dest_dir"
+
+    local moved=0
+    local skipped=0
+    local errors=0
+
+    while IFS= read -r filename || [[ -n "$filename" ]]; do
+        [[ -z "$filename" ]] && continue
+        filename=$(echo "$filename" | tr -d '\r')
+        
+        local source_path="$source_dir/$filename"
+        
+        if [[ ! -e "$source_path" ]]; then
+            echo "[SKIP] File not found: $filename"
+            ((skipped++))
+            continue
+        fi
+        
+        if [[ "$source_path" == "$dest_dir/$filename" ]]; then
+            echo "[SKIP] Already in destination: $filename"
+            ((skipped++))
+            continue
+        fi
+        
+        if [[ -e "$dest_dir/$filename" ]]; then
+            echo "[SKIP] Already exists in destination: $filename"
+            ((skipped++))
+            continue
+        fi
+        
+        if [[ "$dry_run" == "true" ]]; then
+            echo "[DRY RUN] Would move: $filename -> $subdir/"
+        else
+            mv "$source_path" "$dest_dir/$filename"
+            echo "[MOVED] $filename -> $subdir/"
+        fi
+        ((moved++))
+        
+    done < "$filelist"
+
+    echo ""
+    echo "=== Summary ==="
+    echo "Files processed: $((moved + skipped + errors))"
+    echo "Moved/Skipped: $moved / $skipped"
+    [[ $errors -gt 0 ]] && echo "Errors: $errors"
+
+    if [[ "$dry_run" == "true" ]]; then
+        echo ""
+        echo "This was a dry run. Pass 'false' as 4th argument to actually move files."
+    fi
+
+    return 0
+}
+
+cd "$FF_DIR"
 
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
-deactivate ; conda activate ~/pinokio/api/facefusion-pinokio.git/.env ; 
+deactivate ; conda activate "$CONDA_ENV_PATH" ; 
 
-cp /dev/null "$TMP_FILE"  #clear error file
+cp /dev/null "$TMP_FILE"
 
-# Loop through the target directory and scan files of the given type
-# Check the FF error code for each scan and log filenames that don't pass the filter
+files=($1/*.$2)
+total=${#files[@]}
+counter=0
 
-for i in $1/*.$2;
-do
-# echo scanning $i:t
-python facefusion.py headless-run -s $TEST_DIR/test.mp3 -t $i -o $OUTPUT_DIR/test.$2 \
- --processors lip_syncer \
- --execution-providers coreml  \
- --face-detector-angles 0 90 270
+for i in $1/*.$2; do
+    ((counter++))
+    echo "[$counter/$total] Scanning $i:t..."
+    python facefusion.py headless-run -s "$SCAN_AUDIO" -t "$i" -o "$OUTPUT_DIR/test.$2" \
+     --processors lip_syncer \
+     --execution-providers coreml  \
+     --face-detector-angles 0 90 270
 
-if [[ $? -eq 1 ]]; then
+    if [[ $? -eq 1 ]]; then
         echo "$i:t" >> "$TMP_FILE"
     fi
 
 done
 
-$BIN_DIR/organize.sh -s $1 -d _NSFW -f $TMP_FILE -r
+organize_files "$1" "_NSFW" "$TMP_FILE" false
