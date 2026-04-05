@@ -2,6 +2,8 @@
 
 # Frame colorizing for line drawings (cartoon style)
 
+# modified to remove execution processor setting in favor of app defaults
+
 #USAGE <CMD> <OUTPUT_PREFIX> <TGT_DIR> <FILE_TYPE>
 
 SCRIPT_DIR=${0:a:h}
@@ -22,5 +24,4 @@ cd "$FF_DIR"
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
 python facefusion.py batch-run -t "$2/*.$3" -o "$OUTPUT_DIR/$1{index}.$3" \
- --processors frame_colorizer --frame-colorizer-model ddcolor \
- --execution-providers coreml
+ --processors frame_colorizer 

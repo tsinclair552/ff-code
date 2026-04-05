@@ -3,6 +3,8 @@
 # Face swap + enhance batch processing
 # The enhancement takes quite a bit of time so it is recommended mainly for images and short videos.
 
+# modified to minimize facefusion.py command line options in favor of defaults and settings in facefusion.ini
+
 #USAGE <CMD> <OUTPUT_PREFIX> <SRC_IMG> <TGT_DIR> <FILE_TYPE>
 
 SCRIPT_DIR=${0:a:h}
@@ -24,5 +26,4 @@ eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
 python facefusion.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/$1{index}.$4" \
  --processors face_swapper face_enhancer \
- --execution-providers coreml --face-selector-gender female \
- --face-detector-angles 0 90 180 270
+ --face-detector-angles 0 90 270

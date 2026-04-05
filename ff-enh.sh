@@ -1,7 +1,9 @@
 #!/bin/zsh
 
-# Face enhancement only
+# Face enhancement ONLY
 # NOTE: This can take some time, especially for video!
+
+# Modified to remove redundant command line switches
 
 #USAGE <CMD> <OUTPUT_PREFIX> <TGT_DIR> <FILE_TYPE>
 
@@ -23,6 +25,4 @@ cd "$FF_DIR"
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
 python facefusion.py batch-run -t "$2/*.$3" -o "$OUTPUT_DIR/$1{index}.$3" \
- --processors face_enhancer \
- --execution-providers coreml --face-selector-gender female \
- --face-detector-angles 0 90 270
+ --processors face_enhancer --face-detector-angles 0 90 270

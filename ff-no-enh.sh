@@ -3,6 +3,7 @@
 # Face swap only (no enhancement)
 # Modified to set face selector mode to one (default is reference)
 # FF 3.4.1+ needs the reference face to show up in the first frame of a video
+# modified to remove redundant command line switches in favor of app defaults
 
 #USAGE <CMD> <OUTPUT_PREFIX> <SRC_IMG> <TGT_DIR> <FILE_TYPE>
 
@@ -24,6 +25,5 @@ cd "$FF_DIR"
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
 python facefusion.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/$1{index}.$4" \
- --processors face_swapper \
- --execution-providers coreml --face-selector-gender female --face-selector-mode one \
- --face-detector-angles 0 90 180 270
+ --processors face_swapper  --face-selector-mode one \
+ --face-detector-angles 0 90  270

@@ -23,6 +23,4 @@ cd "$FF_DIR"
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
 python facefusion.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/$1{index}.$4" \
- --processors face_swapper \
- --execution-providers coreml --face-selector-gender female \
- --face-detector-angles 0 90 180 270
+ --processors face_swapper --face-detector-angles 0 90 270

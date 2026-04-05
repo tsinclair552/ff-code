@@ -3,6 +3,8 @@
 # Face swap + expression restoration
 # NOTE: Processing time is long - use for small clips only
 
+# modified to remove redundant command line switches in favor of app defaults
+
 #USAGE <CMD> <OUTPUT_PREFIX> <SRC_IMG> <TGT_DIR> <FILE_TYPE>
 
 SCRIPT_DIR=${0:a:h}
@@ -23,6 +25,4 @@ cd "$FF_DIR"
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
 python facefusion.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/$1{index}.$4" \
- --processors face_swapper expression_restorer \
- --execution-providers cpu --face-selector-gender female \
- --face-detector-angles 0 90 180 270
+ --processors face_swapper expression_restorer --face-detector-angles 0 90 270
