@@ -56,7 +56,6 @@ OUTPUT_DIR=~/tmp/facefusion        # Output directory
 FF_DIR=~/.facefusion/facefusion    # FaceFusion installation
 CONDA_ENV_PATH=~/.conda/envs/facefusion  # Conda environment path
 TMP_FILE=~/tmp/facefusion/errors.txt
-SCAN_AUDIO=~/test.mp3              # Audio file for NSFW scanning (lip_syncer requires audio)
 ```
 
 ## Error Handling & Comments

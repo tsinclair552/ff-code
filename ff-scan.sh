@@ -15,7 +15,6 @@ OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
 FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
 CONDA_ENV="${CONDA_ENV:-facefusion}"
 TMP_FILE="${TMP_FILE:-$HOME/tmp/facefusion/errors.txt}"
-SCAN_AUDIO="${SCAN_AUDIO:-$HOME/test.mp3}"
 CONDA_ENV_PATH="$HOME/pinokio/api/facefusion-pinokio.git/.env"
 
 mkdir -p "$OUTPUT_DIR"

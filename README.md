@@ -86,11 +86,7 @@ OUTPUT_DIR=~/tmp/facefusion         # Output directory
 FF_DIR=~/.facefusion/facefusion     # FaceFusion installation
 CONDA_ENV_PATH=~/.conda/envs/facefusion  # Conda environment
 TMP_FILE=~/tmp/facefusion/errors.txt
-SCAN_AUDIO=~/test.mp3              # Audio file for NSFW scanning
 ```
-
-### ff-scan.sh Note
-The NSFW scanning script (`ff-scan.sh`) uses the `lip_syncer` processor which requires an audio file as source. Set `SCAN_AUDIO` in `.env` to any valid audio file path.
 
 ## Troubleshooting
 
