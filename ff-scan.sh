@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # A script to scan files to check for NSFW content
-# Updated to use the lipsync processor to improve performance
+# Updated to use the face_debugger processor to improve performance
 
 #USAGE <CMD> <TGT_DIR> <FILE_TYPE>
 
@@ -113,10 +113,10 @@ counter=0
 for i in $1/*.$2; do
     ((counter++))
     echo "[$counter/$total] Scanning $i:t..."
-    python facefusion.py headless-run -s "$SCAN_AUDIO" -t "$i" -o "$OUTPUT_DIR/test.$2" \
-     --processors lip_syncer \
-     --execution-providers coreml  \
-     --face-detector-angles 0 90 270
+ 
+
+    python facefusion.py headless-run -t "$i" -o "$OUTPUT_DIR/test.$2" \
+     --processors face_debugger
 
     if [[ $? -eq 1 ]]; then
         echo "$i:t" >> "$TMP_FILE"
