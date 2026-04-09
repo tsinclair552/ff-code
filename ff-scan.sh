@@ -14,7 +14,6 @@ FACE_DIR="${FACE_DIR:-$HOME/Faces}"
 OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
 FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
 CONDA_ENV="${CONDA_ENV:-facefusion}"
-TMP_FILE="${TMP_FILE:-$HOME/tmp/facefusion/errors.txt}"
 CONDA_ENV_PATH="$HOME/pinokio/api/facefusion-pinokio.git/.env"
 
 mkdir -p "$OUTPUT_DIR"
@@ -22,24 +21,20 @@ mkdir -p "$OUTPUT_DIR"
 organize_files() {
     local source_dir="$1"
     local subdir="$2"
-    local filelist="$3"
-    local dry_run="${4:-true}"
-
-    if [[ -z "$source_dir" ]] || [[ -z "$subdir" ]] || [[ -z "$filelist" ]]; then
-        echo "Usage: organize_files <source_dir> <subdir> <filelist> [dry_run]" >&2
+    local dry_run="${3:-true}"  # Third argument is dry_run (default true)
+    
+    # Shift off first two arguments to get the array of failed files
+    shift 2
+    
+    if [[ -z "$source_dir" ]] || [[ -z "$subdir" ]]; then
+        echo "Usage: organize_files <source_dir> <subdir> [dry_run] [failed_files...]" >&2
         return 1
     fi
 
     source_dir="${source_dir/#\~/$HOME}"
-    filelist="${filelist/#\~/$HOME}"
 
     if [[ ! -d "$source_dir" ]]; then
         echo "Error: Source directory does not exist: $source_dir" >&2
-        return 1
-    fi
-
-    if [[ ! -f "$filelist" ]]; then
-        echo "Error: Filelist does not exist: $filelist" >&2
         return 1
     fi
 
@@ -50,9 +45,9 @@ organize_files() {
     local skipped=0
     local errors=0
 
-    while IFS= read -r filename || [[ -n "$filename" ]]; do
+    # Process each failed file from the array (all remaining arguments)
+    for filename in "$@"; do
         [[ -z "$filename" ]] && continue
-        filename=$(echo "$filename" | tr -d '\r')
         
         local source_path="$source_dir/$filename"
         
@@ -81,8 +76,7 @@ organize_files() {
             echo "[MOVED] $filename -> $subdir/"
         fi
         ((moved++))
-        
-    done < "$filelist"
+    done
 
     echo ""
     echo "=== Summary ==="
@@ -92,7 +86,7 @@ organize_files() {
 
     if [[ "$dry_run" == "true" ]]; then
         echo ""
-        echo "This was a dry run. Pass 'false' as 4th argument to actually move files."
+        echo "This was a dry run. Pass 'false' as third argument to actually move files."
     fi
 
     return 0
@@ -103,7 +97,8 @@ cd "$FF_DIR"
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; 
 
-cp /dev/null "$TMP_FILE"
+# Use bash array to store failed files instead of external file
+local failed_files=()
 
 files=($1/*.$2)
 total=${#files[@]}
@@ -118,9 +113,10 @@ for i in $1/*.$2; do
      --processors face_debugger
 
     if [[ $? -eq 1 ]]; then
-        echo "$i:t" >> "$TMP_FILE"
+        failed_files+=("$i:t")
     fi
 
 done
 
-organize_files "$1" "_NSFW" "$TMP_FILE" false
+# Pass the array of failed files to organize_files function
+organize_files "$1" "_NSFW" false "${failed_files[@]}"
