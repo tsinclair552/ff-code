@@ -109,6 +109,7 @@ python facefusion.py headless-run -s "$FACE_DIR/$2" -t "$i" -o "$OUTPUT_DIR/test
 
 ```
 ff-code/
+├── .env               # User configuration (created by ff-setup.sh)
 ├── .env.example       # Config template (copy to .env)
 ├── ff-ai.sh          # AI video face swap
 ├── ff-batch.sh       # Face swap + enhance (batch)
@@ -116,6 +117,7 @@ ff-code/
 ├── ff-no-enh.sh      # Face swap only
 ├── ff-ref.sh         # Reference mode selector
 ├── ff-scan.sh        # NSFW content scanning
+├── ff-setup.sh      # Interactive .env setup
 ├── ff-test.sh        # Feature testing
 ├── ff-cartoon.sh     # Cartoon-style face swap
 ├── ff-color.sh       # Color-adjusted face swap
