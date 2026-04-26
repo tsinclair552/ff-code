@@ -120,3 +120,5 @@ done
 
 # Pass the array of failed files to organize_files function
 organize_files "$1" "_NSFW" false "${failed_files[@]}"
+
+rm -f "$OUTPUT_DIR/test.$2"
