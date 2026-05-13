@@ -1,29 +1,15 @@
 #!/bin/zsh
 
-# Interactively set up .env configuration file
+# Interactively set up ff-code configuration file
 
 #USAGE ff-setup.sh
 
-SCRIPT_DIR=${0:a:h}
-ENV_FILE="$SCRIPT_DIR/.env"
-ENV_EXAMPLE="$SCRIPT_DIR/.env.example"
+ENV_FILE="$HOME/.config/ff-code/env"
 
 # Trap for Ctrl+C - exit without saving
 trap 'echo -e "\nSetup cancelled."; exit 1' INT TERM
 
-# Check if .env.example exists
-if [[ ! -f "$ENV_EXAMPLE" ]]; then
-  echo "Error: .env.example not found"
-  exit 1
-fi
-
-# If .env doesn't exist, copy from .env.example
-if [[ ! -f "$ENV_FILE" ]]; then
-  echo "Creating .env from .env.example..."
-  cp "$ENV_EXAMPLE" "$ENV_FILE"
-fi
-
-# Source current .env if it exists
+# Source existing config if present (pre-populates current values)
 if [[ -f "$ENV_FILE" ]]; then
   source "$ENV_FILE"
 fi
@@ -104,4 +90,4 @@ if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
-echo "Setup complete! Configuration saved to .env"
+echo "Setup complete! Configuration saved to $ENV_FILE"
