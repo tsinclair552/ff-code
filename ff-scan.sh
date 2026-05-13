@@ -5,9 +5,9 @@
 
 #USAGE <CMD> <TGT_DIR> <FILE_TYPE>
 
-SCRIPT_DIR=${0:a:h}
-if [[ -f "$SCRIPT_DIR/.env" ]]; then
-    source "$SCRIPT_DIR/.env"
+CONFIG_FILE="$HOME/.config/ff-code/env"
+if [[ -f "$CONFIG_FILE" ]]; then
+    source "$CONFIG_FILE"
 fi
 
 FACE_DIR="${FACE_DIR:-$HOME/Faces}"
