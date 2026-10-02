@@ -1,6 +1,6 @@
 # AGENTS.md - FaceFusion Scripts Codebase
 
-zsh scripts that drive FaceFusion (`facefusion.py batch-run`) for face swapping, enhancement, expression restoration, frame colorizing, NSFW scanning on macOS via Pinokio. Each script is a thin wrapper: load config, `cd` into the FaceFusion install, activate conda, run one `facefusion.py` command.
+zsh scripts that drive FaceFusion (`batch-run` via the `no_reject.py` wrapper) for face swapping, enhancement, expression restoration, frame colorizing, NSFW scanning on macOS via Pinokio. Each script is a thin wrapper: load config, `cd` into the FaceFusion app dir, activate conda, run one FaceFusion command.
 
 ## Build/Lint/Test
 
@@ -23,7 +23,7 @@ FF_DIR=~/.facefusion/facefusion    # FaceFusion install, scripts cd here
 CONDA_ENV=facefusion              # Config only — NOT used for activation
 ```
 
-Gotcha: scripts only honor `FACE_DIR`, `OUTPUT_DIR`, `FF_DIR`. `TARGET_DIR` and `CONDA_ENV` are written by setup but never read. The conda env path is hardcoded in every script as `CONDA_ENV_PATH="$HOME/pinokio/api/facefusion-pinokio.git/.env"`.
+Gotcha: scripts only honor `FACE_DIR`, `OUTPUT_DIR`, `FF_DIR`. `TARGET_DIR` and `CONDA_ENV` are written by setup but never read. The conda env path is hardcoded in every script as `CONDA_ENV_PATH="$HOME/pinokio/api/Facefusion-Pinokio-Masterbranch.git/.env"`.
 
 ## Script Template
 
@@ -45,14 +45,14 @@ FACE_DIR="${FACE_DIR:-$HOME/Faces}"
 OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
 FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
 CONDA_ENV="${CONDA_ENV:-facefusion}"
-CONDA_ENV_PATH="$HOME/pinokio/api/facefusion-pinokio.git/.env"
+CONDA_ENV_PATH="$HOME/pinokio/api/Facefusion-Pinokio-Masterbranch.git/.env"
 
 mkdir -p "$OUTPUT_DIR"
-cd "$FF_DIR"
+cd "$FF_DIR/facefusion"
 
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
-python facefusion.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/$1{index}.$4" \
+python ../no_reject.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/$1{index}.$4" \
  --processors face_swapper ...
 ```
 
@@ -91,14 +91,14 @@ No `--execution-providers`, `--face-selector-gender`, or `--reference-face-dista
 
 ## External Dependencies
 
-FaceFusion via Pinokio at `~/pinokio/api/facefusion-pinokio.git/` (conda env at `.../.env`), FFmpeg (`brew install ffmpeg`). Python 3.10.
+FaceFusion via Pinokio at `~/pinokio/api/Facefusion-Pinokio-Masterbranch.git/` (conda env at `.../.env`, Python 3.12). The app (entry point `facefusion.py` + `facefusion.ini`) lives one level down in `.../facefusion/`. FFmpeg (`brew install ffmpeg`).
 
 ## Common Issues
 
 1. **FFmpeg not installed**: `brew install ffmpeg`
 2. **Face not detected**: use `ff-no-enh.sh` / `ff-ai.sh` (`--face-selector-mode one`) or check source image
-3. **Conda activation fails**: verify `CONDA_ENV_PATH` still matches `~/pinokio/api/facefusion-pinokio.git/.env` (hardcoded, not from config)
-4. **NSFW filtering**: old content_analyzer patch notes in `docs/ff-test-mod.md` (FF 3.2.0 era, likely outdated)
+3. **Conda activation fails**: verify `CONDA_ENV_PATH` still matches `~/pinokio/api/Facefusion-Pinokio-Masterbranch.git/.env` (hardcoded, not from config)
+4. **NSFW filtering**: the current FF master runs a content check on every image step and silently fails NSFW files. Processing scripts therefore call `../no_reject.py` (the user's runtime patch that the Pinokio launcher uses) instead of `facefusion.py` directly. `ff-scan.sh` deliberately calls `facefusion.py` directly because it depends on that check to flag files.
 
 ## Docs
 

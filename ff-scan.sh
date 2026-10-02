@@ -14,7 +14,7 @@ FACE_DIR="${FACE_DIR:-$HOME/Faces}"
 OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
 FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
 CONDA_ENV="${CONDA_ENV:-facefusion}"
-CONDA_ENV_PATH="$HOME/pinokio/api/facefusion-pinokio.git/.env"
+CONDA_ENV_PATH="$HOME/pinokio/api/Facefusion-Pinokio-Masterbranch.git/.env"
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -92,7 +92,7 @@ organize_files() {
     return 0
 }
 
-cd "$FF_DIR"
+cd "$FF_DIR/facefusion"
 
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; 
