@@ -1,6 +1,6 @@
 # FaceFusion Scripts
 
-zsh scripts that drive [FaceFusion](https://facefusion.io) (`facefusion.py batch-run`) on macOS via Pinokio: face swapping, enhancement, expression restoration, frame colorizing, face editing (de-smile), and NSFW scanning.
+zsh scripts that drive [FaceFusion](https://facefusion.io) (`batch-run` via the `no_reject.py` wrapper) on macOS via Pinokio: face swapping, enhancement, expression restoration, frame colorizing, face editing (de-smile), and NSFW scanning.
 
 ## Prerequisites
 
@@ -49,7 +49,7 @@ Config is saved to `~/.config/ff-code/env`. Ctrl+C cancels without saving; type 
 ./ff-scan.sh ~/Videos mp4
 ```
 
-Failing files are moved into `<TARGET_DIR>/_NSFW/`.
+Failing files are moved into `<scanned-dir>/_NSFW/`.
 
 ## Scripts
 
@@ -66,6 +66,7 @@ Failing files are moved into `<TARGET_DIR>/_NSFW/`.
 | `ff-edit.sh` | `<PREFIX> <DIR> <EXT>` | Face editor + enhance; de-smile presets |
 | `ff-color.sh` | `<PREFIX> <DIR> <EXT>` | Frame colorizing (deoldify_stable) |
 | `ff-cartoon.sh` | `<PREFIX> <DIR> <EXT>` | Frame colorizing for line drawings |
+| `ff-frame.sh` | `<PREFIX> <DIR> <EXT>` | Frame enhancement (`frame_enhancer`) |
 | `ff-scan.sh` | `<DIR> <EXT>` | NSFW scanning (moves failures to `_NSFW/`) |
 
 The output prefix `<PREFIX>` is a format string — `{index}` is replaced with the file index (e.g. `out{index}.jpg` → `out0.jpg`, `out1.jpg`).
