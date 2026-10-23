@@ -72,6 +72,7 @@ python ../no_reject.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/
 | `ff-edit.sh` | `<PREFIX> <DIR> <EXT>` | `face_editor face_enhancer`, de-smile: `--face-editor-mouth-smile -0.5 --face-editor-lip-open-ratio -0.8` |
 | `ff-color.sh` | `<PREFIX> <DIR> <EXT>` | `frame_colorizer --frame-colorizer-model deoldify_stable` |
 | `ff-cartoon.sh` | `<PREFIX> <DIR> <EXT>` | `frame_colorizer` (line-drawing colorize) |
+| `ff-frame.sh` | `<PREFIX> <DIR> <EXT>` | `frame_enhancer` (app-default model) |
 | `ff-scan.sh` | `<DIR> <EXT>` | NSFW scan; loops `headless-run` with `face_debugger`, moves failing files to `_NSFW/` |
 | `ff-setup.sh` | — | Interactive config writer (no facefusion call) |
 
