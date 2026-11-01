@@ -51,6 +51,15 @@ Config is saved to `~/.config/ff-code/env`. Ctrl+C cancels without saving; type 
 
 Failing files are moved into `<scanned-dir>/_NSFW/`.
 
+### Lip-Sync Audio to a Video
+```bash
+./ff-lipsync.sh voice.mp3 clip.mp4                # lip_syncer + face_enhancer
+./ff-lipsync.sh voice.mp3 clip.mp4 --test         # lip_syncer only (quick preview)
+./ff-lipsync.sh voice.mp3 clip.mp4 --weight 0.75  # adjust lip-sync intensity
+```
+
+Output is saved as `clip-lipsync.mp4` in `$OUTPUT_DIR` — the source audio replaces the video's original track. The video is trimmed to the audio length (rounded up to the next second); it errors out if the video is shorter than the audio. Preview with `--test`, dial in `--weight` (0.0–1.0 in 0.05 steps), then run without `--test` for the final render.
+
 ## Scripts
 
 | Script | Args | Purpose |
@@ -67,6 +76,7 @@ Failing files are moved into `<scanned-dir>/_NSFW/`.
 | `ff-color.sh` | `<PREFIX> <DIR> <EXT>` | Frame colorizing (deoldify_stable) |
 | `ff-cartoon.sh` | `<PREFIX> <DIR> <EXT>` | Frame colorizing for line drawings |
 | `ff-frame.sh` | `<PREFIX> <DIR> <EXT>` | Frame enhancement (`frame_enhancer`) |
+| `ff-lipsync.sh` | `<AUDIO> <VIDEO> [--test] [--weight N]` | Lip-sync audio to video (`lip_syncer face_enhancer`; `--test` = lip_syncer only) |
 | `ff-scan.sh` | `<DIR> <EXT>` | NSFW scanning (moves failures to `_NSFW/`) |
 
 The output prefix `<PREFIX>` is a format string — `{index}` is replaced with the file index (e.g. `out{index}.jpg` → `out0.jpg`, `out1.jpg`).

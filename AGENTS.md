@@ -73,6 +73,7 @@ python ../no_reject.py batch-run -s "$FACE_DIR/$2" -t "$3/*.$4" -o "$OUTPUT_DIR/
 | `ff-color.sh` | `<PREFIX> <DIR> <EXT>` | `frame_colorizer --frame-colorizer-model deoldify_stable` |
 | `ff-cartoon.sh` | `<PREFIX> <DIR> <EXT>` | `frame_colorizer` (line-drawing colorize) |
 | `ff-frame.sh` | `<PREFIX> <DIR> <EXT>` | `frame_enhancer` (app-default model) |
+| `ff-lipsync.sh` | `<AUDIO> <VIDEO> [--test] [--weight N]` | Lip-sync: `lip_syncer face_enhancer` (via `headless-run`, not batch); `--test` = lip_syncer only, `--weight` = lip-syncer-weight 0.0-1.0/0.05 steps |
 | `ff-scan.sh` | `<DIR> <EXT>` | NSFW scan; loops `headless-run` with `face_debugger`, moves failing files to `_NSFW/` |
 | `ff-setup.sh` | — | Interactive config writer (no facefusion call) |
 
