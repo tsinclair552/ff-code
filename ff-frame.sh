@@ -6,6 +6,7 @@
 
 #USAGE <OUTPUT_PREFIX> <TGT_DIR> <FILE_TYPE>
 
+[[ -f "${0:A:h}/ff-lib.sh" ]] || { print -u2 -- "${0:t}: shared library not found: ${0:A:h}/ff-lib.sh"; exit 1; }
 source "${0:A:h}/ff-lib.sh"          # config + shared helpers (see ff-lib.sh)
 
 ff_require_args 3 "<OUTPUT_PREFIX> <TGT_DIR> <FILE_TYPE>"

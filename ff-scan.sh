@@ -6,6 +6,7 @@
 #USAGE <CMD> <TGT_DIR> <FILE_TYPE>
 
 FF_FILTER=on                          # this script needs the content filter to flag files
+[[ -f "${0:A:h}/ff-lib.sh" ]] || { print -u2 -- "${0:t}: shared library not found: ${0:A:h}/ff-lib.sh"; exit 1; }
 source "${0:A:h}/ff-lib.sh"          # config + shared helpers (see ff-lib.sh)
 
 ff_require_args 2 "<TGT_DIR> <FILE_TYPE>"

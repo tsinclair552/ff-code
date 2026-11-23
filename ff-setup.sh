@@ -56,6 +56,7 @@ trap 'print -u2 -- ""; print -u2 -- "Setup cancelled - $ENV_FILE not written."; 
 # Shared helpers and current values (defaults applied). The "no config yet"
 # warning is suppressed: on a first run that is the expected state.
 FF_SUPPRESS_CONFIG_WARNING=1
+[[ -f "${0:A:h}/ff-lib.sh" ]] || { print -u2 -- "${0:t}: shared library not found: ${0:A:h}/ff-lib.sh"; exit 1; }
 source "${0:A:h}/ff-lib.sh"          # config + shared helpers (see ff-lib.sh)
 
 # Prompt order is explicit - an associative array iterates in hash order, which
