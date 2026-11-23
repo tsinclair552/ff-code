@@ -34,7 +34,7 @@ Anything already set in the environment **wins over the file**, so `FF_FILTER=on
 
 `TARGET_DIR`, `CONDA_ENV` and `OUTPUT_DIR` were retired: the first two were never read by any script, and the output directory now comes from the selected install's `facefusion.ini` (`[paths] output_path`, falling back to `~/Documents`). `ff-setup.sh` drops them from an existing file on its next run and preserves any key it does not own.
 
-`.env.example` in the repo is a legacy stub that still lists the retired keys; nothing reads it and it should be deleted.
+`.env.example` was deleted: it listed the retired keys and nothing read it. The real config file is written by `ff-setup.sh` — do not recreate a `.env` stub.
 
 ## Installs and the content filter
 
