@@ -15,7 +15,10 @@
 # therefore cannot empty the variable or run a command. The cost is that no
 # expansion happens inside the file - a leading ~ is expanded here, $VAR is not.
 
-FF_SCRIPT="${0:t}"
+# $0 inside a sourced file is the sourced file's own name, so error messages
+# would all say "ff-lib.sh". $ZSH_ARGZERO holds the name the calling script was
+# invoked as, which is what a user needs to see.
+FF_SCRIPT="${ZSH_ARGZERO:t}"
 FF_CONFIG_FILE="${FF_CONFIG_FILE:-$HOME/.config/ff-code/env}"
 
 # --- errors ----------------------------------------------------------------
