@@ -31,11 +31,9 @@ ff_preflight_target "$2" "$3"
 
 mkdir -p "$OUTPUT_DIR" || fail "cannot create output dir: $OUTPUT_DIR"
 
-cd "$FF_DIR/facefusion" || fail "app dir not found: $FF_DIR/facefusion"
+cd "$FF_APP_DIR" || fail "app dir not found: $FF_APP_DIR"
 
-eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
-deactivate ; conda activate "$CONDA_ENV_PATH" ; \
-python ../no_reject.py batch-run -t "$2/*.$3" -o "$OUTPUT_DIR/$1{index}.$3" \
+PATH="$FF_ENV_BIN:$PATH" "$FF_PYTHON" "$FF_ENTRY" batch-run -t "$2/*.$3" -o "$OUTPUT_DIR/$1{index}.$3" \
  --processors face_editor face_enhancer \
  --face-detector-angles 0 90 270 --face-editor-mouth-smile -0.5 --face-editor-lip-open-ratio -0.8
 

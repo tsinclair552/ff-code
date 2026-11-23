@@ -114,11 +114,9 @@ OUT_FILE="$OUTPUT_DIR/${VIDEO:t:r}-lipsync"
 PROCESSORS=(lip_syncer)
 [[ "$TEST" -eq 0 ]] && PROCESSORS=(lip_syncer face_enhancer)
 
-cd "$FF_DIR/facefusion" || fail "FF_DIR not found: $FF_DIR/facefusion"
+cd "$FF_APP_DIR" || fail "app dir not found: $FF_APP_DIR"
 
-eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
-deactivate ; conda activate "$CONDA_ENV_PATH" ; \
-python ../no_reject.py headless-run -s "$AUDIO" -t "$VIDEO" -o "$OUT_FILE" \
+PATH="$FF_ENV_BIN:$PATH" "$FF_PYTHON" "$FF_ENTRY" headless-run -s "$AUDIO" -t "$VIDEO" -o "$OUT_FILE" \
  --processors "$PROCESSORS[@]" --lip-syncer-weight "$WEIGHT" "$TRIM_ARGS[@]"
 
 rc=$?

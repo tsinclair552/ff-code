@@ -5,6 +5,7 @@
 
 #USAGE <CMD> <TGT_DIR> <FILE_TYPE>
 
+FF_FILTER=on                          # this script needs the content filter to flag files
 source "${0:A:h}/ff-lib.sh"          # config + shared helpers (see ff-lib.sh)
 
 ff_require_args 2 "<TGT_DIR> <FILE_TYPE>"
@@ -87,10 +88,7 @@ organize_files() {
     return 0
 }
 
-cd "$FF_DIR/facefusion" || fail "app dir not found: $FF_DIR/facefusion"
-
-eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
-deactivate ; conda activate "$CONDA_ENV_PATH" ; 
+cd "$FF_APP_DIR" || fail "app dir not found: $FF_APP_DIR"
 
 # Use bash array to store failed files instead of external file
 local failed_files=()
@@ -104,7 +102,7 @@ for i in "$1"/*."$2"(N); do
     echo "[$counter/$total] Scanning $i:t..."
  
 
-    python facefusion.py headless-run -t "$i" -o "$OUTPUT_DIR/test.$2" \
+    PATH="$FF_ENV_BIN:$PATH" "$FF_PYTHON" "$FF_ENTRY" headless-run -t "$i" -o "$OUTPUT_DIR/test.$2" \
      --processors face_debugger
 
     rc=$?
@@ -116,7 +114,15 @@ for i in "$1"/*."$2"(N); do
 
 done
 
-# Pass the array of failed files to organize_files function
-organize_files "$1" "_NSFW" false "${failed_files[@]}"
+# Pass the array of failed files to organize_files. Skip the call when nothing
+# was flagged: an empty array expansion disappears, so the dry_run argument
+# ("false") would be taken as the first file name and reported as a phantom skip.
+if (( ${#failed_files} )); then
+    organize_files "$1" "_NSFW" false "${failed_files[@]}"
+else
+    print -- ""
+    print -- "=== Summary ==="
+    print -- "Scanned $counter file(s): nothing flagged"
+fi
 
 rm -f "$OUTPUT_DIR/test.$2"

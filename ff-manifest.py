@@ -27,19 +27,22 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 BASELINE = HERE / ".ff-manifest.baseline"
 LIBRARY = "ff-lib.sh"
-COMMAND_RE = re.compile(r"python\s+[^\n]*?(?:no_reject|facefusion)\.py[^\n]*")
+COMMAND_RE = re.compile(
+    r'(?:"\$FF_PYTHON"\s+"\$FF_ENTRY"|python\s+[^\n]*?(?:no_reject|facefusion)\.py)[^\n]*'
+)
 CD_RE = re.compile(r"^\s*cd\s+(\S+)")
 CONDA_RE = re.compile(r"conda\s+activate\s+(\S+)")
 LIB_RE = re.compile(r'source\s+"\$\{0:A:h\}/([^"]+)"')
 
 # Values ff-lib.sh resolves at runtime. They are not in the script text, so the
-# gate cannot see them without asking the library - and one of them (output_dir)
-# is read from the FaceFusion install's own facefusion.ini.
-RESOLVED = ("output_dir", "app_dir", "conda_path")
+# gate cannot see them without asking the library - and some of them come from
+# outside the repo entirely (the install's own facefusion.ini, its metadata.py).
+RESOLVED = ("app_dir", "python", "entry", "version", "filter", "output_dir")
 RESOLVE_SNIPPET = (
-    'source ./%s >/dev/null 2>&1; print -r -- "$OUTPUT_DIR"; '
-    'print -r -- "$FF_APP_DIR"; print -r -- "$CONDA_ENV_PATH"' % LIBRARY
-)
+    'source ./%s >/dev/null 2>&1; '
+    'print -r -- "$FF_APP_DIR"; print -r -- "$FF_PYTHON"; print -r -- "$FF_ENTRY"; '
+    'print -r -- "$FF_VERSION"; print -r -- "$FF_FILTER"; print -r -- "$OUTPUT_DIR"'
+) % LIBRARY
 
 
 def redact(value: str) -> str:
