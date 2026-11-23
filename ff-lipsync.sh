@@ -6,16 +6,7 @@
 
 #USAGE <AUDIO> <VIDEO> [--test] [--weight N]
 
-CONFIG_FILE="$HOME/.config/ff-code/env"
-if [[ -f "$CONFIG_FILE" ]]; then
-    source "$CONFIG_FILE"
-fi
-
-FACE_DIR="${FACE_DIR:-$HOME/Faces}"
-OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
-FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
-CONDA_ENV="${CONDA_ENV:-facefusion}"
-CONDA_ENV_PATH="$HOME/pinokio/api/Facefusion-Pinokio-Masterbranch.git/.env"
+source "${0:A:h}/ff-lib.sh"          # config + shared helpers (see ff-lib.sh)
 
 usage() {
     echo "Usage: ff-lipsync.sh <AUDIO> <VIDEO> [--test] [--weight N]" >&2
@@ -113,7 +104,7 @@ else
     echo "ff-lipsync.sh: video and audio match, no trim"
 fi
 
-mkdir -p "$OUTPUT_DIR"
+mkdir -p "$OUTPUT_DIR" || fail "cannot create output dir: $OUTPUT_DIR"
 
 # output name derives from the video: clip.mp4 -> clip-lipsync.mp4
 OUT_EXT="${VIDEO:t:e}"

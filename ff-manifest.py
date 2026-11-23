@@ -20,14 +20,31 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 BASELINE = HERE / ".ff-manifest.baseline"
+LIBRARY = "ff-lib.sh"
 COMMAND_RE = re.compile(r"python\s+[^\n]*?(?:no_reject|facefusion)\.py[^\n]*")
 CD_RE = re.compile(r"^\s*cd\s+(\S+)")
 CONDA_RE = re.compile(r"conda\s+activate\s+(\S+)")
+LIB_RE = re.compile(r'source\s+"\$\{0:A:h\}/([^"]+)"')
+
+# Values ff-lib.sh resolves at runtime. They are not in the script text, so the
+# gate cannot see them without asking the library - and one of them (output_dir)
+# is read from the FaceFusion install's own facefusion.ini.
+RESOLVED = ("output_dir", "app_dir", "conda_path")
+RESOLVE_SNIPPET = (
+    'source ./%s >/dev/null 2>&1; print -r -- "$OUTPUT_DIR"; '
+    'print -r -- "$FF_APP_DIR"; print -r -- "$CONDA_ENV_PATH"' % LIBRARY
+)
+
+
+def redact(value: str) -> str:
+    """Keep the baseline free of this machine's absolute paths."""
+    return value.replace(str(Path.home()), "$HOME")
 
 
 def logical_lines(text: str) -> list[str]:
@@ -61,7 +78,7 @@ def strip_trailing_punct(s: str) -> str:
 
 def manifest_entry(path: Path) -> str:
     text = path.read_text(errors="ignore")
-    cwd = conda = ""
+    cwd = conda = lib = ""
     commands: list[str] = []
 
     for line in logical_lines(text):
@@ -73,10 +90,15 @@ def manifest_entry(path: Path) -> str:
             m = CONDA_RE.search(line)
             if m:
                 conda = strip_trailing_punct(m.group(1))
+        if not lib:
+            m = LIB_RE.search(line)
+            if m:
+                lib = m.group(1)
         for m in COMMAND_RE.finditer(line):
             commands.append(squash(m.group(0)).rstrip(";").strip())
 
-    lines = [f"### {path.name}", f"cwd:   {cwd or '<none>'}", f"conda: {conda or '<none>'}"]
+    lines = [f"### {path.name}", f"cwd:   {cwd or '<none>'}", f"conda: {conda or '<none>'}",
+             f"lib:   {lib or '<none>'}"]
     if commands:
         for i, c in enumerate(commands, 1):
             lines.append(f"cmd{i}:  {c}")
@@ -85,13 +107,31 @@ def manifest_entry(path: Path) -> str:
     return "\n".join(lines)
 
 
+def resolved_block() -> str:
+    """Ask ff-lib.sh what it actually resolves, rather than re-implementing it."""
+    try:
+        done = subprocess.run(
+            ["zsh", "-c", RESOLVE_SNIPPET],
+            cwd=str(HERE), capture_output=True, text=True, timeout=60,
+        )
+        values = done.stdout.splitlines()
+    except (OSError, subprocess.SubprocessError):
+        values = []
+    values += [""] * (len(RESOLVED) - len(values))
+
+    lines = ["### resolved (via ff-lib.sh - environment, not script text)"]
+    for name, value in zip(RESOLVED, values):
+        lines.append(f"{name + ':':<12}{redact(value) if value else '<unresolved>'}")
+    return "\n".join(lines)
+
+
 def build() -> str:
     entries = []
     for p in sorted(HERE.glob("ff-*.sh")):
-        if p.name == Path(__file__).name:
+        if p.name in (Path(__file__).name, LIBRARY):
             continue
         entries.append(manifest_entry(p))
-    return "\n\n".join(entries) + "\n"
+    return resolved_block() + "\n\n" + "\n\n".join(entries) + "\n"
 
 
 def main() -> int:

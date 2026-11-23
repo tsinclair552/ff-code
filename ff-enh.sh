@@ -7,20 +7,11 @@
 
 #USAGE <CMD> <OUTPUT_PREFIX> <TGT_DIR> <FILE_TYPE>
 
-CONFIG_FILE="$HOME/.config/ff-code/env"
-if [[ -f "$CONFIG_FILE" ]]; then
-    source "$CONFIG_FILE"
-fi
+source "${0:A:h}/ff-lib.sh"          # config + shared helpers (see ff-lib.sh)
 
-FACE_DIR="${FACE_DIR:-$HOME/Faces}"
-OUTPUT_DIR="${OUTPUT_DIR:-$HOME/tmp/facefusion}"
-FF_DIR="${FF_DIR:-$HOME/.facefusion/facefusion}"
-CONDA_ENV="${CONDA_ENV:-facefusion}"
-CONDA_ENV_PATH="$HOME/pinokio/api/Facefusion-Pinokio-Masterbranch.git/.env"
+mkdir -p "$OUTPUT_DIR" || fail "cannot create output dir: $OUTPUT_DIR"
 
-mkdir -p "$OUTPUT_DIR"
-
-cd "$FF_DIR/facefusion"
+cd "$FF_DIR/facefusion" || fail "app dir not found: $FF_DIR/facefusion"
 
 eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
