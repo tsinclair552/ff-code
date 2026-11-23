@@ -120,3 +120,6 @@ eval "$(conda shell.bash hook)" ; conda deactivate ; conda deactivate ; conda \
 deactivate ; conda activate "$CONDA_ENV_PATH" ; \
 python ../no_reject.py headless-run -s "$AUDIO" -t "$VIDEO" -o "$OUT_FILE" \
  --processors "$PROCESSORS[@]" --lip-syncer-weight "$WEIGHT" "$TRIM_ARGS[@]"
+
+rc=$?
+ff_check_exit $rc "FaceFusion headless-run"

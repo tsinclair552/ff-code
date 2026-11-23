@@ -21,6 +21,11 @@
 FF_SCRIPT="${ZSH_ARGZERO:t}"
 FF_CONFIG_FILE="${FF_CONFIG_FILE:-$HOME/.config/ff-code/env}"
 
+# The script's own arguments, captured now: inside a function, $1 is the
+# function's first argument, not the script's.
+FF_ARGC=$#
+typeset -a FF_ARGV=("$@")
+
 # --- errors ----------------------------------------------------------------
 
 # Every message names the script that failed, on stderr, and exits non-zero.
@@ -32,6 +37,65 @@ fail() {
 require_dir() { [[ -d "$2" ]] || fail "$1 not found: $2"; }
 require_file() { [[ -f "$2" ]] || fail "$1 not found: $2"; }
 require_cmd() { (( $+commands[$1] )) || fail "$1 not found (install it or add it to PATH)"; }
+
+# --- preflight -------------------------------------------------------------
+#
+# Everything that can be checked before FaceFusion starts, checked before it
+# starts. Each of these catches a failure that would otherwise surface as a
+# silent non-zero exit from the pipeline.
+
+# Argument guard. No arguments means the user wants the usage, which is not an
+# error; the wrong number is.
+ff_require_args() {
+  local want="$1" usage="$2"
+  if (( FF_ARGC == 0 )); then
+    print -u2 -- "Usage: $FF_SCRIPT $usage"
+    exit 0
+  fi
+  if (( FF_ARGC != want )); then
+    print -u2 -- "$FF_SCRIPT: expected $want arguments, got $FF_ARGC"
+    print -u2 -- "Usage: $FF_SCRIPT $usage"
+    exit 1
+  fi
+}
+
+# FACE_DIR is where source faces come from. It lives on an external volume, so
+# an unmounted disk is the likeliest cause of it being missing.
+ff_preflight_face_dir() {
+  if [[ ! -d "$FACE_DIR" ]]; then
+    local hint=""
+    [[ "$FACE_DIR" == /Volumes/* ]] && hint=" - is the volume mounted?"
+    fail "face source directory not found: $FACE_DIR$hint"
+  fi
+}
+
+# $1 = face file name inside FACE_DIR
+ff_preflight_source() {
+  ff_preflight_face_dir
+  require_file "source face" "$FACE_DIR/$1"
+}
+
+# $1 = target directory, $2 = extension. FaceFusion resolves the target pattern
+# itself and exits 1 with no message when it matches nothing, so count first.
+ff_preflight_target() {
+  local dir="$1" ext="$2"
+  require_dir "target directory" "$dir"
+  local -a matches=("$dir"/*."$ext"(N))
+  if (( ${#matches} == 0 )); then
+    fail "no .$ext files in $dir (FaceFusion would exit 1 without saying why)"
+  fi
+  print -- "$FF_SCRIPT: ${#matches} target file(s) to process"
+}
+
+# $1 = exit code, $2 = what ran. FaceFusion's own exit 1 is silent, so say so.
+ff_check_exit() {
+  local rc="$1" what="${2:-FaceFusion}"
+  (( rc == 0 )) && return 0
+  print -u2 -- "$FF_SCRIPT: $what failed (exit $rc)"
+  print -u2 -- "  Exit 1 with no other message usually means no files matched the target"
+  print -u2 -- "  pattern, or a bad {placeholder} in the output pattern."
+  exit "$rc"
+}
 
 # --- config ----------------------------------------------------------------
 

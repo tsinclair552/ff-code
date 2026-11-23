@@ -7,6 +7,10 @@
 
 source "${0:A:h}/ff-lib.sh"          # config + shared helpers (see ff-lib.sh)
 
+ff_require_args 2 "<TGT_DIR> <FILE_TYPE>"
+ff_preflight_target "$1" "$2"
+
+
 mkdir -p "$OUTPUT_DIR" || fail "cannot create output dir: $OUTPUT_DIR"
 
 organize_files() {
@@ -91,11 +95,11 @@ deactivate ; conda activate "$CONDA_ENV_PATH" ;
 # Use bash array to store failed files instead of external file
 local failed_files=()
 
-files=($1/*.$2)
+files=("$1"/*."$2"(N))
 total=${#files[@]}
 counter=0
 
-for i in $1/*.$2; do
+for i in "$1"/*."$2"(N); do
     ((counter++))
     echo "[$counter/$total] Scanning $i:t..."
  
@@ -103,8 +107,11 @@ for i in $1/*.$2; do
     python facefusion.py headless-run -t "$i" -o "$OUTPUT_DIR/test.$2" \
      --processors face_debugger
 
-    if [[ $? -eq 1 ]]; then
+    rc=$?
+    if (( rc == 1 )); then
         failed_files+=("$i:t")
+    elif (( rc != 0 )); then
+        print -u2 -- "$FF_SCRIPT: $i:t: analysis failed (exit $rc)"
     fi
 
 done
